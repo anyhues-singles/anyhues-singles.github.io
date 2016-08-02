@@ -6,7 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <meta name="author" content="Andreas Niehues"/>
     <title>Andreas Niehues - Systemisch integrative Praxis für Paar- und Familientherapie, Coaching und psychologische Beratung, Sexualberatung und Sexualpädagogik</title>
-    <link rel="stylesheet" href="https://niehues-assets.github.io/css/main-a9a158a2b9.css"/>
+    <link rel="stylesheet" href="https://niehues-assets.github.io/css/main-9ee631e1e5.css"/>
+    <div class="script">
+      <document class="createElement" picture="picture"></document>
+    </div>
+    <script src="https://niehues-assets.github.io/vendor/picturefill.min.js"></script>
   </head>
   <body>
     <header class="sub-header">
@@ -28,8 +32,8 @@
           <source srcset="https://niehues-assets.github.io/images/singles-bg-1024-085c9229f5.png" media="(min-width: 640px)"/><img src="https://niehues-assets.github.io/images/singles-bg-640-3e1ec9c8a9.png" alt=""/>
         </picture>
         <div class="central-teaser">
-          <h1>Einzeltherapie</h1>
-          <p class="sub-title">Systemisch integrative Praxis für Paar- und Familientherapie, Coaching und psychologische Beratung, Sexualberatung und Sexualpädagogik</p>
+          <h1>Coaching &amp; psychologische Beratung</h1>
+          <p class="sub-title">Systemisch integrative Praxis für <span class="together">Paar- und Familientherapie</span>, <span class="together">Coaching und psychologische Beratung</span>, <span class="together">Sexualberatung und Sexualpädagogik</span></p>
         </div>
       </div>
     </header>
@@ -65,7 +69,7 @@
                     <div class="img-container"></div><span class="label">Familien</span></a></li>
                 <li class="teaser teaser-corporations"><a href="#">
                     <div class="overlay"></div>
-                    <div class="img-container"></div><span class="label">Organisationen</span></a></li>
+                    <div class="img-container"></div><span class="label">Fachkräfte</span></a></li>
           </ul>
     </section>
     <div class="about-me-wrapper">
@@ -129,9 +133,9 @@ Die Anbindung an die umliegenden Städte ist ideal, die A40 und die A52 sind 10 
         <div class="error-message" style="display: none">Es ist ein unbekannter Fehler aufgetreten, bitte versuchen Sie es erneut oder versuchen Sie telefonischen Kontakt aufzunehmen.</div>
         <div class="validation-message" style="display: none">Bitte füllen Sie alle Felder entsprechend aus.</div>
         <label for="email-address">E-Mail</label>
-        <input id="email-address" type="email" name="email" required="true" placeholder="email@beispiel.de"/>
+        <input id="email-address" type="email" name="email" placeholder="email@beispiel.de"/>
         <label for="content">Nachricht</label>
-        <textarea id="content" name="content" required="true" placeholder="Ihre Nachricht ..."></textarea>
+        <textarea id="content" name="content" placeholder="Ihre Nachricht ..."></textarea>
         <input type="hidden" name="_format" value="plain"/>
         <input type="text" name="_gotcha" style="display:none"/>
         <div class="action">
@@ -155,10 +159,13 @@ Die Anbindung an die umliegenden Städte ist ideal, die A40 und die A52 sind 10 
       $('.contact-form').on('submit', function(e) {
         e.preventDefault();
       
+        var error = false;
         var target = $(e.target);
+        var inputs = target.find('input, textarea');
         var email = target.find('#email-address');
         var content = target.find('#content');
         var validationMessage = target.find('.validation-message');
+        var mailSuffixPattern = new RegExp("^.*?\\.[a-zA-Z]{2,3}$");
         email.removeClass('error');
         content.removeClass('error');
         validationMessage.hide()
@@ -168,15 +175,26 @@ Die Anbindung an die umliegenden Städte ist ideal, die A40 und die A52 sind 10 
           return obj;
         }, {});
       
-        if (!data['email'] || !email[0].checkValidity()) {
-          validationMessage.show()
-          email.addClass('error')
+        console.log("MAIL SUFFIX", data['email'])
+        console.log("MAIL SUFFIX", mailSuffixPattern.test(data['email']))
+        if (!data['email'] || !email[0].checkValidity() || !mailSuffixPattern.test(data['email'])) {
+          email.addClass('error');
+          error = true
         }
       
         if (!data['content'] || !content[0].checkValidity()) {
-          validationMessage.show()
-          content.addClass('error')
+          content.addClass('error');
+          error = true
         }
+      
+        if (error) {
+          target.find('.success-message').hide();
+          target.find('.error-message').hide();
+          validationMessage.show();
+          return;
+        }
+      
+        inputs.attr('disabled', 'disabled');
       
         $.ajax({
           url: ("https!!!://?!!formspree?!.i?o/" + address).replace(/[\?,\!]/gi, ""),
@@ -184,14 +202,17 @@ Die Anbindung an die umliegenden Städte ist ideal, die A40 und die A52 sind 10 
           data: data,
           dataType: "json",
           success: function() {
-            validationMessage.hide()
-            target.find('.error-message').hide()
-            target.find('.success-message').show()
+            inputs.attr('disabled', false);
+            email.val('')
+            content.val('')
+            validationMessage.hide();
+            target.find('.error-message').hide();
+            target.find('.success-message').show();
           },
           error: function() {
-            target.find('.success-message').hide()
-            validationMessage.hide()
-            target.find('.error-message').show()
+            target.find('.success-message').hide();
+            validationMessage.hide();
+            target.find('.error-message').show();
           }
         });
       });
